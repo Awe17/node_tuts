@@ -5,6 +5,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const Blog = require('./models/blog');
 
 
 // connect to mongodb
@@ -26,12 +27,7 @@ app.use(morgan('dev'));
 app.use(express.static('public'));
 
 app.get('/',(req,res)=>{
-    blogs =[
-        {title:'Daniel lands on the moon', snippet:'Lorem ipsum dolor sit amet consectetur.'},
-        {title:'Sarah makes star of the play', snippet:'Lorem ipsum dolor sit amet consectetur.'},
-        {title:'Lizzy wins prom queen', snippet:'Lorem ipsum dolor sit amet consectetur.'}
-    ]
-    res.render('index.ejs',{title: 'Home', blogs});
+    res.redirect('/blogs');
 });
 
 app.get('/about',(req,res)=>{
@@ -42,7 +38,16 @@ app.get('/blogs/create',(req,res)=>{
     res.render('create.ejs',{title:'Create'});
 })
 
-
+app.get('/blogs',(req,res)=>{
+    Blog.find().sort({createdAt: 'desc'})
+        .then((result)=>{
+            res.render('index.ejs',{title:'All Blogs',blogs: result});
+        })
+        .catch(err=>{
+            console.log(err);
+        })
+  
+})
     
 // download file
 app.get('/download',(req,res)=>{
